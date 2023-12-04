@@ -20,7 +20,7 @@ void loop() {
     delay(10); // wait a bit so the servo turns slowly
   }
 
-  for (int i = 180; i >= 0; i++) {
+  for (int i = 180; i >= 0; i--) {
     servo.write(i);
     Serial.println(i);
     delay(10);  

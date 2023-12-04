@@ -136,7 +136,7 @@ void setup() {
   pinMode(DIR_RIGHT2, OUTPUT);
   pinMode(DIR_LEFT1, OUTPUT);
   pinMode(DIR_LEFT2, OUTPUT);
-  setSpeed(250, 250); // 200 is recommended as 100 is not enough voltage to move the motors
+  setSpeed(150, 150); // 200 is recommended as 100 is not enough voltage to move the motors
 
   // servo setup
   servo.attach(SERVO);
@@ -152,6 +152,10 @@ void loop() {
   
   Serial.println("STOP");
   if (checkSides()) return;
-   else while (!checkSides()) backward(500);
+  else {
+    while (!checkSides()) {
+      backward(500);
+    }
+  }
 
 }

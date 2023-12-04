@@ -12,6 +12,8 @@
 void setup() {
   pinMode(US_TRIG, OUTPUT); // indicate that we're only using the trigger pin to output stuff
   pinMode(US_ECHO, INPUT); // indicate that we're only using the echo pin to receive stuff
+
+  Serial.begin(9600);
 }
 
 void loop() {
