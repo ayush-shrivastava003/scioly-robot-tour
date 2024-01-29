@@ -85,45 +85,6 @@ void right(int t) {
   stop();
 }
 
-// Calculates the distance ahead of the ultrasonic sensor in centimeters.
-int usDistance() {
-  digitalWrite(US_TRIG, LOW);
-  delayMicroseconds(5); // ensure that NO signals are being emitted by keeping voltage low
-  digitalWrite(US_TRIG, HIGH);
-  delayMicroseconds(15); // emit ultrasonic sound for 10 microseconds
-  digitalWrite(US_TRIG, LOW);
-  
-  long echoTime = pulseIn(US_ECHO, HIGH);
-  int dist = (echoTime * 0.0343) / 2; // 0.0343 is the speed of sound in cm/microsecond
-  Serial.println(dist);
-  return dist;
-}
-
-boolean checkSides() {
-  stop();
-  servo.write(0);
-  delay(250);
-  
-  if (usDistance() > OBSTACLE_DIST) {
-    Serial.write("RIGHT");
-    right(375);
-    servo.write(90);
-    return true;
-  }
-  
-  servo.write(180);
-  delay(400);
-  if (usDistance() > OBSTACLE_DIST) {
-    Serial.write("LEFT");
-    left(375);
-    servo.write(90);
-    return true;
-  }
-
-  servo.write(90);
-  return false;
-}
-
 void setup() {
   // ultrasonic sensor setup
   pinMode(US_TRIG, OUTPUT);
@@ -147,15 +108,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  while (usDistance() > OBSTACLE_DIST) forward();
-  if (usDistance() > OBSTACLE_DIST) return; // this might seem redundant, but sometimes there's a random 0 returned that breaks the loop
-  
-  Serial.println("STOP");
-  if (checkSides()) return;
-  else {
-    while (!checkSides()) {
-      backward(500);
-    }
-  }
+  // Serial.println("Hello");
 
 }
