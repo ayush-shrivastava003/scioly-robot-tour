@@ -7,10 +7,11 @@ const byte RIGHT_ENCODER = 2;
 #define DIR_RIGHT2 8 // 2 of 2 direction pins for the right motor
 #define DIR_LEFT1 9 // 1 of 2 direction pins for the left motor
 #define DIR_LEFT2 10 // 2 of 2 direction pins for the left motor
-unsigned int counterLeft = 0;
-unsigned int counterRight = 0;
+volatile int counterLeft = 0;
+volatile int counterRight = 0;
 const float SLOTS = 20.0;
-const float WHEEL_DIAMETER = 2.7; // in cm
+const float WHEEL_DIAMETER = 2.6; // in cm
+const unsigned int SPEED = 100;
 
 void countLeft() {
   counterLeft++;
@@ -20,23 +21,15 @@ void countRight() {
   counterRight++;  
 }
 
-//void onInterrupt() {
-//  Timer1.detachInterrupt();
-//  Serial.print("Motor speed: ");
-//  float rpm = (counterLeft / slots) * 60.0;
-//  Serial.print(rpm); Serial.println(" rpm");
-//  counter = 0;
-//  Timer1.attachInterrupt(ISRTimerOne);
-//}
-
 int convertDist(int dist) {
   float circumference = WHEEL_DIAMETER * 3.14159265358979323846;
-  float stepsPerTurn = SLOTS / circumference;
-  return (int)(dist * stepsPerTurn);
+  float stepsPerTurn = circumference / SLOTS;
+  return (int)(dist / stepsPerTurn);
 }
 
 void forward(int dist) {
-  int counts = convertDist(dist);
+//  int counts = convertDist(dist);
+  int counts = dist;
   Serial.print("counts: "); Serial.println(counts);
   counterLeft = 0;
   counterRight = 0;
@@ -47,12 +40,12 @@ void forward(int dist) {
   digitalWrite(DIR_RIGHT2, HIGH);
 
   while (counterLeft < counts && counterRight < counts) {
-    Serial.print("left: "); Serial.println(counterLeft);
-    if (counterLeft < counts) analogWrite(LEFT_PWM, 150);
+//    Serial.print("left: "); Serial.println(counterLeft);
+    if (counterLeft < counts) analogWrite(LEFT_PWM, SPEED);
     else analogWrite(LEFT_PWM, 0);
 
-    Serial.print("right: "); Serial.println(counterRight);
-    if (counterRight < counts) analogWrite(RIGHT_PWM, 150);
+//    Serial.print("right: "); Serial.println(counterRight);
+    if (counterRight < counts) analogWrite(RIGHT_PWM, SPEED);
     else analogWrite(RIGHT_PWM, 0);
   }
 
@@ -65,9 +58,11 @@ void forward(int dist) {
 
 void setup() {
   // put your setup code here, to run once:
+  counterLeft = 0;
+  counterRight = 0;
   Serial.begin(9600);
-  attachInterrupt(digitalPinToInterrupt(LEFT_ENCODER), counterLeft, RISING);
-  attachInterrupt(digitalPinToInterrupt(RIGHT_ENCODER), counterRight, RISING);
+  attachInterrupt(digitalPinToInterrupt(LEFT_ENCODER), countLeft, RISING);
+  attachInterrupt(digitalPinToInterrupt(RIGHT_ENCODER), countRight, RISING);
   
   pinMode(RIGHT_PWM, OUTPUT);
   pinMode(LEFT_PWM, OUTPUT);
@@ -79,7 +74,9 @@ void setup() {
   analogWrite(LEFT_PWM, 0);
   analogWrite(RIGHT_PWM, 0);
 
-  forward(10);
+  forward(convertDist((WHEEL_DIAMETER * 3.14159265358979323846)));
+  delay(1000);
+//  forward(1);
  
 }
 void loop() {
